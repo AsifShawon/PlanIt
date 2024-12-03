@@ -8,6 +8,7 @@ import {
   Share,
   Alert,
   FlatList,
+  Button,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getFirestore, doc, deleteDoc } from 'firebase/firestore';
@@ -51,7 +52,7 @@ const CountdownTimer = ({ startDate }: { startDate: string }) => {
         const days = Math.floor(distance / (1000 * 60 * 60 * 24));
         const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        
+
         setTimeLeft(`${days}d ${hours}h ${minutes}m`);
       }
     }, 60000);
@@ -132,7 +133,7 @@ ${plan.places.map((place) => `- ${place.name} (${place.duration})`).join('\n')}
             try {
               const db = getFirestore();
               await deleteDoc(doc(db, 'user_plans', user!.uid, 'plans', plan.id));
-              navigation.goBack();
+              navigation.replace("MyPlans");
             } catch (error) {
               Alert.alert('Error', 'Failed to delete plan');
             }
@@ -160,16 +161,19 @@ ${plan.places.map((place) => `- ${place.name} (${place.duration})`).join('\n')}
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
+      <TouchableOpacity onPress={() => navigation.replace('MyPlans')}>
+          <Ionicons name="arrow-back" size={24} style={styles.backArrow} color="black" />
+        </TouchableOpacity>
         <Text style={styles.destination}>{plan.destination}</Text>
         <View style={styles.headerActions}>
           <TouchableOpacity onPress={handleShare} style={styles.iconButton}>
-            <Ionicons name="share-outline" size={24} color="#007AFF" />
+            <Ionicons name="share-outline" size={24} style={styles.backArrow} color="#007AFF" />
           </TouchableOpacity>
-          <TouchableOpacity 
-            onPress={() => navigation.navigate('EditPlan', { plan })} 
+          <TouchableOpacity
+            onPress={() => navigation.navigate('EditPlan', { plan })}
             style={styles.iconButton}
           >
-            <Ionicons name="create-outline" size={24} color="#007AFF" />
+            <Ionicons name="create-outline" size={24} style={styles.backArrow} color="#007AFF" />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleDelete} style={styles.iconButton}>
             <Ionicons name="trash-outline" size={24} color="#FF3B30" />
@@ -232,22 +236,26 @@ ${plan.places.map((place) => `- ${place.name} (${place.duration})`).join('\n')}
 
 const styles = StyleSheet.create({
   container: {
+    paddingTop: 50,
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#C1CB9C',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: 'white',
+    padding: 15,
+    backgroundColor: '#3A4646',
     borderBottomWidth: 1,
     borderBottomColor: '#e1e1e1',
+  },
+  backArrow:{
+    color:'#C1CB9C',
   },
   destination: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#333',
+    color: '#FFFFFF',
   },
   headerActions: {
     flexDirection: 'row',

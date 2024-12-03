@@ -51,10 +51,10 @@ const CountdownTimer = ({ startDate }: { startDate: string }) => {
         const days = Math.floor(distance / (1000 * 60 * 60 * 24));
         const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        
+
         setTimeLeft(`${days}d ${hours}h ${minutes}m`);
       }
-    }, 60000); 
+    }, 60000);
 
     return () => clearInterval(timer);
   }, [startDate]);
@@ -119,7 +119,7 @@ export default function MyPlans({ navigation }: any) {
   const renderPlanCard = ({ item }: { item: TravelPlan }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('PlanDetails', { plan: item })}
+      onPress={() => navigation.replace('Plan', { plan: item })}
     >
       <View style={styles.cardHeader}>
         <Text style={styles.destination}>{item.destination}</Text>
@@ -164,6 +164,13 @@ export default function MyPlans({ navigation }: any) {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.replace('Tabs', { screen: 'Profile' })}>
+          <Ionicons name="arrow-back" size={24} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.top_text}>My Plans</Text>
+        <View style={styles.emptySpace} />
+      </View>
       <View style={styles.expenditureSummary}>
         <Text style={styles.expenditureTitle}>Total Expected Expenditure</Text>
         <Text style={styles.expenditureAmount}>${totalExpenditure.toLocaleString()}</Text>
@@ -196,13 +203,32 @@ export default function MyPlans({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    paddingBottom: 16,
+  },
+  top_text: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    textAlign: 'center',
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#3A4646',
+  },
+  emptySpace: {
+    width: 24,
+  },
+  container: {
+    paddingTop: 50,
+    flex: 1,
+    backgroundColor: '#C1CB9C',
     padding: 16,
   },
   expenditureSummary: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#566b5b',
     padding: 16,
     borderRadius: 12,
     marginBottom: 16,
@@ -236,7 +262,7 @@ const styles = StyleSheet.create({
   },
   addButton: {
     flexDirection: 'row',
-    backgroundColor: '#007AFF',
+    backgroundColor: '#276e52',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',

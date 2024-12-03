@@ -9,6 +9,8 @@ import HomeScreen from './app/(tabs)/home';
 import CreatePlan from './app/(tabs)/createPlan'; 
 import ProfileScreen from './app/(tabs)/profile'; 
 import MyPlans from './app/screens/MyPlansScreen';
+import PlanDetails from './app/screens/planScreen';
+import EditPlan from './app/screens/editPlan';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -80,6 +82,16 @@ export default function App() {
         <Stack.Screen
           name="MyPlans"
           component={MyPlans}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Plan"
+          component={PlanDetails}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="EditPlan"
+          component={EditPlan}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

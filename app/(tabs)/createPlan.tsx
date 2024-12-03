@@ -137,6 +137,8 @@ export default function CreatePlan({ navigation }: any) {
         {
           text: 'OK',
           onPress: () => navigation.navigate('MyPlans'),
+          // set default value for onPress
+          
         },
       ]);
     } catch (error: any) {
