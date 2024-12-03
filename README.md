@@ -6,3 +6,6 @@
 
 ## Here is the *Create Plan* flow
 <img src="./Create Plan Flow.png"/>
+
+## Here is the *Plan's Screens* flow
+<img src="./PlanFlow.png"/>
