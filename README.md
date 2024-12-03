@@ -5,4 +5,4 @@
 - Other people can join them if the plans are public
 
 ## Here is the *Create Plan* flow
-<img src=
+<img src="./Create Plan Flow.png"/>
