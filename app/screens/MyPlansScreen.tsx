@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { getFirestore, collection, query, getDocs, orderBy } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
-import { FIREBASE_AUTH } from '../../FirebaseConfig';
+import { FIREBASE_AUTH } from '../../FirebaseConfig.ts';
 import { Ionicons } from '@expo/vector-icons';
 
 interface Place {

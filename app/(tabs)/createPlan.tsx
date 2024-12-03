@@ -12,7 +12,7 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
-import { FIREBASE_AUTH, FIREBASE_DB } from '../../FirebaseConfig';
+import { FIREBASE_AUTH, FIREBASE_DB } from '../../FirebaseConfig.ts';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 interface Place {
