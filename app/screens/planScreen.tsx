@@ -99,7 +99,7 @@ export default function PlanDetails({ route, navigation }: any) {
 📅 ${formatDate(plan.startDate)} - ${formatDate(plan.endDate)}
 ⏱ Duration: ${tripDuration} days
 🚗 Transport: ${plan.vehicle}
-💰 Budget: $${plan.expectedExpenditure}
+💰 Budget: ৳${plan.expectedExpenditure}
 🏨 Accommodation: ${plan.accommodation}
 
 📍 Places to visit:
@@ -153,7 +153,7 @@ ${plan.places.map((place) => `- ${place.name} (${place.duration})`).join('\n')}
       {item.notes && <Text style={styles.placeNotes}>{item.notes}</Text>}
       <View style={styles.placeExpense}>
         <Ionicons name="cash-outline" size={16} color="#666" />
-        <Text style={styles.expenseText}>${item.expenses_places}</Text>
+        <Text style={styles.expenseText}>৳{item.expenses_places}</Text>
       </View>
     </View>
   );
@@ -196,7 +196,7 @@ ${plan.places.map((place) => `- ${place.name} (${place.duration})`).join('\n')}
         </View>
         <View style={styles.detailRow}>
           <Ionicons name="cash-outline" size={20} color="#666" />
-          <Text style={styles.detailText}>${plan.expectedExpenditure}</Text>
+          <Text style={styles.detailText}>৳{plan.expectedExpenditure}</Text>
         </View>
         <View style={styles.detailRow}>
           <Ionicons name="home-outline" size={20} color="#666" />

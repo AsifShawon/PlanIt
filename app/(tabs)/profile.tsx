@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { FIREBASE_AUTH, FIREBASE_DB } from '../../FirebaseConfig.ts';  // Import Firestore
+import { FIREBASE_AUTH, FIREBASE_DB } from '../../FirebaseConfig';  // Import Firestore
 import { signOut } from 'firebase/auth'; 
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { onAuthStateChanged } from 'firebase/auth';

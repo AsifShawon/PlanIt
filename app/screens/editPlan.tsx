@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getFirestore, doc, updateDoc } from 'firebase/firestore';
-import { FIREBASE_AUTH } from '../../FirebaseConfig.ts';
+import { FIREBASE_AUTH } from '../../FirebaseConfig';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 interface Place {
@@ -55,7 +55,7 @@ export default function EditPlan({ route, navigation }: any) {
       });
 
       Alert.alert('Success', 'Plan updated successfully');
-      navigation.replace('PlanDetails', { plan: editedPlan });
+      navigation.replace('MyPlans');
     } catch (error) {
       Alert.alert('Error', 'Failed to update plan');
     }

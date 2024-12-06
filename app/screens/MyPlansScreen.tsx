@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { getFirestore, collection, query, getDocs, orderBy } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
-import { FIREBASE_AUTH } from '../../FirebaseConfig.ts';
+import { FIREBASE_AUTH } from '../../FirebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 
 interface Place {
@@ -144,7 +144,7 @@ export default function MyPlans({ navigation }: any) {
         </View>
         <View style={styles.infoItem}>
           <Ionicons name="cash-outline" size={16} color="#666" />
-          <Text style={styles.infoText}>${item.expectedExpenditure}</Text>
+          <Text style={styles.infoText}>৳{item.expectedExpenditure}</Text>
         </View>
         <View style={styles.infoItem}>
           <Ionicons name="location-outline" size={16} color="#666" />
@@ -173,7 +173,7 @@ export default function MyPlans({ navigation }: any) {
       </View>
       <View style={styles.expenditureSummary}>
         <Text style={styles.expenditureTitle}>Total Expected Expenditure</Text>
-        <Text style={styles.expenditureAmount}>${totalExpenditure.toLocaleString()}</Text>
+        <Text style={styles.expenditureAmount}>৳{totalExpenditure.toLocaleString()}</Text>
       </View>
 
       <TouchableOpacity
