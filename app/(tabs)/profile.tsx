@@ -7,7 +7,7 @@ import { Image } from 'expo-image';
 import { TouchableOpacity } from 'react-native';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 type RootStackParamList = {
@@ -16,29 +16,59 @@ type RootStackParamList = {
   MyPlans: undefined;
 };
 
+interface Plan {
+  endDate: string;
+}
+
 export default function Profile() {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList, 'Home'>>();
   const [user, setUser] = useState<any>(null);
-  const [userData, setUserData] = useState<any>(null); 
+  const [userData, setUserData] = useState<any>(null);
+  const [totalPlans, setTotalPlans] = useState<number>(0);
+  const [completedPlans, setCompletedPlans] = useState<number>(0);
+
+  const fetchPlanCounts = async (userId: string) => {
+    try {
+      const plansRef = collection(FIREBASE_DB, 'user_plans', userId, 'plans');
+      const querySnapshot = await getDocs(plansRef);
+      
+      const plans = querySnapshot.docs.map(doc => doc.data() as Plan);
+      const total = plans.length;
+      
+      const currentDate = new Date();
+      const completed = plans.filter(plan => {
+        const endDate = new Date(plan.endDate);
+        return endDate < currentDate;
+      }).length;
+      
+      setTotalPlans(total);
+      setCompletedPlans(completed);
+    } catch (error) {
+      console.error('Error fetching plan counts:', error);
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, async (user) => {
       if (user) {
-        setUser(user); 
+        setUser(user);
         try {
-          const userRef = doc(FIREBASE_DB, 'users', user.uid); 
+          const userRef = doc(FIREBASE_DB, 'users', user.uid);
           const userSnapshot = await getDoc(userRef);
           if (userSnapshot.exists()) {
-            setUserData(userSnapshot.data()); 
+            setUserData(userSnapshot.data());
           } else {
             console.log('No user data found in Firestore');
           }
+          await fetchPlanCounts(user.uid);
         } catch (error) {
           console.error('Error fetching user data from Firestore: ', error);
         }
       } else {
         setUser(null);
-        setUserData(null); 
+        setUserData(null);
+        setTotalPlans(0);
+        setCompletedPlans(0);
       }
     });
 
@@ -47,10 +77,10 @@ export default function Profile() {
 
   const handleLogout = async () => {
     try {
-      await signOut(FIREBASE_AUTH); 
+      await signOut(FIREBASE_AUTH);
       console.log('User logged out successfully!');
-      navigation.replace('Login'); 
-    } catch (error:any) {
+      navigation.replace('Login');
+    } catch (error: any) {
       console.error('Error signing out: ', error.message);
     }
   };
@@ -70,7 +100,7 @@ export default function Profile() {
             <View style={styles.avatarContainer}>
               <Image 
                 style={styles.avatar}
-                source={user.photoURL ? { uri: user.photoURL } : require('../../assets/user.png')} 
+                source={user.photoURL ? { uri: user.photoURL } : require('../../assets/user.png')}
                 contentFit="cover"
                 transition={1000}
               />
@@ -86,19 +116,14 @@ export default function Profile() {
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
               <Ionicons name="calendar-outline" size={24} color="#3A4646" />
-              <Text style={styles.statNumber}>12</Text>
+              <Text style={styles.statNumber}>{totalPlans}</Text>
               <Text style={styles.statLabel}>Plans</Text>
             </View>
             <View style={styles.statItem}>
               <Ionicons name="checkmark-circle-outline" size={24} color="#3A4646" />
-              <Text style={styles.statNumber}>8</Text>
+              <Text style={styles.statNumber}>{completedPlans}</Text>
               <Text style={styles.statLabel}>Completed</Text>
             </View>
-            {/* <View style={styles.statItem}>
-              <Ionicons name="star-outline" size={24} color="#3A4646" />
-              <Text style={styles.statNumber}>4.8</Text>
-              <Text style={styles.statLabel}>Rating</Text>
-            </View> */}
           </View>
 
           <TouchableOpacity 
@@ -109,12 +134,6 @@ export default function Profile() {
             <Text style={styles.menuButtonText}>My Plans</Text>
             <Ionicons name="chevron-forward-outline" size={24} color="#ffffff" />
           </TouchableOpacity>
-
-          {/* <TouchableOpacity style={styles.menuButton}>
-            <Ionicons name="settings-outline" size={24} color="#ffffff" />
-            <Text style={styles.menuButtonText}>Settings</Text>
-            <Ionicons name="chevron-forward-outline" size={24} color="#ffffff" />
-          </TouchableOpacity> */}
         </View>
       ) : (
         <View style={styles.loadingContainer}>

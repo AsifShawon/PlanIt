@@ -10,14 +10,14 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { 
-  getFirestore, 
+import {
+  getFirestore,
   collectionGroup,
   collection,
-  query, 
-  getDocs, 
-  where, 
-  orderBy, 
+  query,
+  getDocs,
+  where,
+  orderBy,
   limit,
   DocumentSnapshot,
   addDoc,
@@ -65,11 +65,11 @@ const PublicPlansSection = ({ navigation }: any) => {
 
   const fetchPublicPlans = async (loadMore = false) => {
     if (!hasMore && loadMore) return;
-    
+
     try {
       setLoading(true);
       const db = getFirestore();
-      
+
       let publicPlansQuery = query(
         collectionGroup(db, 'plans'),
         where('visibility', '==', 'public'),
@@ -77,7 +77,7 @@ const PublicPlansSection = ({ navigation }: any) => {
         orderBy('__name__'),
         limit(10)
       );
-  
+
       if (loadMore && lastVisible) {
         publicPlansQuery = query(
           collectionGroup(db, 'plans'),
@@ -87,7 +87,7 @@ const PublicPlansSection = ({ navigation }: any) => {
           limit(10)
         );
       }
-  
+
       const querySnapshot = await getDocs(publicPlansQuery).catch(err => {
         if (err.code === 'failed-precondition' || err.message.includes('requires an index')) {
           throw new Error(
@@ -96,7 +96,7 @@ const PublicPlansSection = ({ navigation }: any) => {
         }
         throw err;
       });
-  
+
       const fetchedPlans: TravelPlan[] = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data() as TravelPlan;
@@ -105,18 +105,19 @@ const PublicPlansSection = ({ navigation }: any) => {
           id: doc.id,
         });
       });
-  
-      setPublicPlans(prev => 
+
+      setPublicPlans(prev =>
         loadMore ? [...prev, ...fetchedPlans] : fetchedPlans
       );
-  
+
       if (querySnapshot.docs.length > 0) {
         setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
         setHasMore(querySnapshot.docs.length === 10);
       } else {
         setHasMore(false);
       }
-  
+      console.log('Fetched public plans:', fetchedPlans);
+
       setError(null);
     } catch (err) {
       console.error('Error fetching public plans:', err);
@@ -127,6 +128,7 @@ const PublicPlansSection = ({ navigation }: any) => {
   };
 
   const handleSavePlan = async (plan: TravelPlan) => {
+    console.log('Saving plan:', plan);
     if (!currentUser) {
       Alert.alert('Error', 'Please login to save plans');
       return;
@@ -134,26 +136,27 @@ const PublicPlansSection = ({ navigation }: any) => {
 
     try {
       const db = getFirestore();
-      const savedPlansRef = collection(db, `users/${currentUser.uid}/savedPlans`);
-      
+      const savedPlansRef = collection(db, `user_plans/${currentUser.uid}/plans`);
+      const query_ref = collection(db, `user_plans/`);
+
       // Check if already saved
-      const existingQuery = query(savedPlansRef, where('originalPlanId', '==', plan.id));
+      const existingQuery = query(query_ref, where('plans.id', '==', plan.id));
       const existingDocs = await getDocs(existingQuery);
-      
+
       if (!existingDocs.empty) {
-        Alert.alert('Info', 'Plan already saved to your list');
+        Alert.alert('Info', 'Plan already exists to your list');
         return;
       }
 
       const savedPlan = {
         ...plan,
         originalPlanId: plan.id,
-        originalUserId: plan.userId,
+        originalUserId: currentUser.uid,
         savedAt: serverTimestamp(),
         isEdited: false,
-        visibility: 'private' 
+        visibility: 'private'
       };
-      delete savedPlan.id; 
+      delete savedPlan.id;
 
       await addDoc(savedPlansRef, savedPlan);
       Alert.alert('Success', 'Plan saved successfully!');
@@ -208,6 +211,12 @@ const PublicPlansSection = ({ navigation }: any) => {
             </TouchableOpacity>
           </View>
         )}
+
+        {isOwnPlan && (
+          <View style={styles.actionButtonsContainer}>
+            <Text style={styles.alreadySaved}>Already Saved</Text>
+          </View>
+        )}
       </TouchableOpacity>
     );
   };
@@ -230,7 +239,7 @@ const PublicPlansSection = ({ navigation }: any) => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView 
+      <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContainer}
@@ -238,7 +247,7 @@ const PublicPlansSection = ({ navigation }: any) => {
         {publicPlans.length === 0 ? (
           <View style={[styles.card, styles.emptyCard]}>
             <Text style={styles.emptyText}>No travel plans yet</Text>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.createButton}
               onPress={() => navigation.navigate('CreatePlan')}
             >
@@ -388,6 +397,13 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     backgroundColor: '#276e52',
+  },
+  alreadySaved: {
+    color: '#3A4646',
+    fontSize: 15,
+    fontWeight: '500',
+    flex: 1,
+    textAlign: 'center',
   },
   actionButtonText: {
     color: '#fff',

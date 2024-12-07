@@ -124,15 +124,15 @@ const AuthScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 30,
+    padding: 25,
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#C1CB9C',
   },
   title: {
     fontSize: 30,
     fontWeight: 'bold',
-    color: '#007BFF',
+    color: '#3A4646',
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#3A4646',
     paddingVertical: 15,
     borderRadius: 8,
     marginVertical: 10,
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   toggleButtonText: {
-    color: '#007BFF',
+    color: '#3A4646',
     fontSize: 16,
     textDecorationLine: 'underline',
   },

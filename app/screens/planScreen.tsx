@@ -8,11 +8,11 @@ import {
   Share,
   Alert,
   FlatList,
-  Button,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getFirestore, doc, deleteDoc } from 'firebase/firestore';
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
+import { getAuth } from 'firebase/auth';
 
 interface Place {
   name: string;
@@ -22,6 +22,7 @@ interface Place {
 }
 
 interface TravelPlan {
+  userId: string;
   id: string;
   destination: string;
   startDate: string;
@@ -157,11 +158,15 @@ ${plan.places.map((place) => `- ${place.name} (${place.duration})`).join('\n')}
       </View>
     </View>
   );
-
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
+  const isOwnPlan = currentUser && plan.userId === currentUser.uid;
+  // console.log("Is own plan",isOwnPlan);
   return (
+
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-      <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} style={styles.backArrow} color="black" />
         </TouchableOpacity>
         <Text style={styles.destination}>{plan.destination}</Text>
@@ -169,15 +174,15 @@ ${plan.places.map((place) => `- ${place.name} (${place.duration})`).join('\n')}
           <TouchableOpacity onPress={handleShare} style={styles.iconButton}>
             <Ionicons name="share-outline" size={24} style={styles.backArrow} color="#007AFF" />
           </TouchableOpacity>
-          <TouchableOpacity
+          {isOwnPlan && (<><TouchableOpacity
             onPress={() => navigation.navigate('EditPlan', { plan })}
             style={styles.iconButton}
           >
             <Ionicons name="create-outline" size={24} style={styles.backArrow} color="#007AFF" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleDelete} style={styles.iconButton}>
-            <Ionicons name="trash-outline" size={24} color="#FF3B30" />
-          </TouchableOpacity>
+            <TouchableOpacity onPress={handleDelete} style={styles.iconButton}>
+              <Ionicons name="trash-outline" size={24} color="#FF3B30" />
+            </TouchableOpacity></>)}
         </View>
       </View>
 
@@ -249,8 +254,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#e1e1e1',
   },
-  backArrow:{
-    color:'#C1CB9C',
+  backArrow: {
+    color: '#C1CB9C',
   },
   destination: {
     fontSize: 24,

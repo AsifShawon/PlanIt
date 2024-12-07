@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { getFirestore, collection, addDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, doc, setDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { FIREBASE_AUTH, FIREBASE_DB } from '../../FirebaseConfig';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -120,25 +120,30 @@ export default function CreatePlan({ navigation }: any) {
       Alert.alert('Error', 'Please login to save your plan');
       return;
     }
-
+  
     setLoading(true);
     try {
       const db = getFirestore();
       const userPlansRef = collection(db, 'user_plans', user.uid, 'plans');
-
-      await addDoc(userPlansRef, {
+  
+      // Generate a unique plan ID
+      const newPlanRef = doc(userPlansRef);
+      const planWithId = {
         ...plan,
+        id: newPlanRef.id,  
+        userId: user.uid,   
         createdAt: new Date(),
         startDate: plan.startDate.toISOString(),
         endDate: plan.endDate.toISOString(),
-      });
-
+      };
+  
+      // Save the plan with the generated ID
+      await setDoc(newPlanRef, planWithId);
+  
       Alert.alert('Success', 'Your travel plan has been saved!', [
         {
           text: 'OK',
           onPress: () => navigation.navigate('MyPlans'),
-          // set default value for onPress
-          
         },
       ]);
     } catch (error: any) {
