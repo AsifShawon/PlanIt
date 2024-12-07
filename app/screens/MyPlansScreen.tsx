@@ -165,7 +165,7 @@ export default function MyPlans({ navigation }: any) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.replace('Tabs', { screen: 'Profile' })}>
+        <TouchableOpacity onPress={() => navigation.navigate('Tabs', { screen: 'Home' })}>
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
         <Text style={styles.top_text}>My Plans</Text>

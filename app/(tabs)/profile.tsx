@@ -1,11 +1,14 @@
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { FIREBASE_AUTH, FIREBASE_DB } from '../../FirebaseConfig';  // Import Firestore
+import { FIREBASE_AUTH, FIREBASE_DB } from '../../FirebaseConfig';  
 import { signOut } from 'firebase/auth'; 
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { Image } from 'expo-image';
+import { TouchableOpacity } from 'react-native';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState } from 'react';
-import { doc, getDoc } from 'firebase/firestore'; 
+import { doc, getDoc } from 'firebase/firestore';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 type RootStackParamList = {
   Home: undefined;
@@ -13,7 +16,7 @@ type RootStackParamList = {
   MyPlans: undefined;
 };
 
-export default function Profie() {
+export default function Profile() {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList, 'Home'>>();
   const [user, setUser] = useState<any>(null);
   const [userData, setUserData] = useState<any>(null); 
@@ -23,7 +26,6 @@ export default function Profie() {
       if (user) {
         setUser(user); 
         try {
-          
           const userRef = doc(FIREBASE_DB, 'users', user.uid); 
           const userSnapshot = await getDoc(userRef);
           if (userSnapshot.exists()) {
@@ -55,33 +57,71 @@ export default function Profie() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Profile</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>Profile</Text>
+        <TouchableOpacity onPress={handleLogout}>
+          <Ionicons name="log-out-outline" size={24} color="#FF5733" />
+        </TouchableOpacity>
+      </View>
 
-      {/* Profile Card */}
       {user && userData ? (
-        <View style={styles.profileCard}>
-          <View style={styles.avatarContainer}>
-            <Image 
-              style={styles.avatar}
-              source={user.photoURL ? { uri: user.photoURL } : require('../../assets/user.png')} 
-            />
+        <View style={styles.content}>
+          <View style={styles.profileCard}>
+            <View style={styles.avatarContainer}>
+              <Image 
+                style={styles.avatar}
+                source={user.photoURL ? { uri: user.photoURL } : require('../../assets/user.png')} 
+                contentFit="cover"
+                transition={1000}
+              />
+            </View>
+            <View style={styles.userInfoContainer}>
+              <Text style={styles.name}>
+                {`${userData.firstName || 'First Name'} ${userData.lastName || 'Last Name'}`}
+              </Text>
+              <Text style={styles.email}>{user.email}</Text>
+            </View>
           </View>
-          <View style={styles.userInfoContainer}>
-            <Text style={styles.name}>{`${userData.firstName || 'First Name'} ${userData.lastName || 'Last Name'}`}</Text>
-            <Text style={styles.email}>{user.email}</Text>
+
+          <View style={styles.statsContainer}>
+            <View style={styles.statItem}>
+              <Ionicons name="calendar-outline" size={24} color="#3A4646" />
+              <Text style={styles.statNumber}>12</Text>
+              <Text style={styles.statLabel}>Plans</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Ionicons name="checkmark-circle-outline" size={24} color="#3A4646" />
+              <Text style={styles.statNumber}>8</Text>
+              <Text style={styles.statLabel}>Completed</Text>
+            </View>
+            {/* <View style={styles.statItem}>
+              <Ionicons name="star-outline" size={24} color="#3A4646" />
+              <Text style={styles.statNumber}>4.8</Text>
+              <Text style={styles.statLabel}>Rating</Text>
+            </View> */}
           </View>
+
+          <TouchableOpacity 
+            style={styles.menuButton}
+            onPress={() => navigation.replace('MyPlans')}
+          >
+            <Ionicons name="list-outline" size={24} color="#ffffff" />
+            <Text style={styles.menuButtonText}>My Plans</Text>
+            <Ionicons name="chevron-forward-outline" size={24} color="#ffffff" />
+          </TouchableOpacity>
+
+          {/* <TouchableOpacity style={styles.menuButton}>
+            <Ionicons name="settings-outline" size={24} color="#ffffff" />
+            <Text style={styles.menuButtonText}>Settings</Text>
+            <Ionicons name="chevron-forward-outline" size={24} color="#ffffff" />
+          </TouchableOpacity> */}
         </View>
       ) : (
-        <Text style={styles.loadingText}>Loading user information...</Text>
+        <View style={styles.loadingContainer}>
+          <Ionicons name="reload-outline" size={40} color="#3A4646" />
+          <Text style={styles.loadingText}>Loading profile...</Text>
+        </View>
       )}
-      <TouchableOpacity style={styles.logoutButton} onPress={()=>navigation.replace('MyPlans')}>
-        <Text style={styles.logoutText}>My Plans</Text>
-      </TouchableOpacity>
-
-      {/* Logout Button */}
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutText}>Logout</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -89,72 +129,129 @@ export default function Profie() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 10,
+    backgroundColor: '#C1CB9C',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     padding: 20,
-    paddingTop: 50,
-    backgroundColor: '#f9f9f9',
+    paddingTop: 60,
+    backgroundColor: '#C1CB9C',
+  },
+  content: {
+    flex: 1,
+    padding: 20,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 20,
+    color: '#3A4646',
   },
   profileCard: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 10,
-    elevation: 5,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
     padding: 20,
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   avatarContainer: {
-    borderWidth: 2,
-    borderColor: '#007BFF',
-    borderRadius: 50,
-    width: 100,
-    height: 100,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 3,
+    borderColor: '#3A4646',
     overflow: 'hidden',
     marginBottom: 15,
   },
   avatar: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
   },
   userInfoContainer: {
     alignItems: 'center',
   },
   name: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#3A4646',
     marginBottom: 5,
   },
   email: {
-    fontSize: 18,
-    color: '#666',
+    fontSize: 16,
+    color: '#666666',
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  statItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  statNumber: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#3A4646',
+    marginTop: 5,
+  },
+  statLabel: {
+    fontSize: 14,
+    color: '#666666',
+    marginTop: 2,
+  },
+  menuButton: {
+    backgroundColor: '#3A4646',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    borderRadius: 12,
+    marginBottom: 10,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  menuButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+    flex: 1,
+    marginLeft: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   loadingText: {
     fontSize: 16,
-    color: '#999',
-    textAlign: 'center',
-    marginTop: 20,
-  },
-  logoutButton: {
-    marginTop: 20,
-    backgroundColor: '#FF5733',
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 8,
-    alignSelf: 'center',
-  },
-  logoutText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: '#666666',
+    marginTop: 10,
   },
 });

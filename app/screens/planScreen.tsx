@@ -161,7 +161,7 @@ ${plan.places.map((place) => `- ${place.name} (${place.duration})`).join('\n')}
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-      <TouchableOpacity onPress={() => navigation.replace('MyPlans')}>
+      <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} style={styles.backArrow} color="black" />
         </TouchableOpacity>
         <Text style={styles.destination}>{plan.destination}</Text>

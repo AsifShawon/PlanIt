@@ -11,6 +11,7 @@ import ProfileScreen from './app/(tabs)/profile';
 import MyPlans from './app/screens/MyPlansScreen';
 import PlanDetails from './app/screens/planScreen';
 import EditPlan from './app/screens/editPlan';
+import AllPublicPlansScreen from './app/screens/publicPlans';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -93,6 +94,11 @@ export default function App() {
           name="EditPlan"
           component={EditPlan}
           options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="publicplans"
+          component={AllPublicPlansScreen}
+          options={{ headerShown: false }} 
         />
       </Stack.Navigator>
     </NavigationContainer>
