@@ -22,6 +22,8 @@ import {
   DocumentSnapshot,
   addDoc,
   serverTimestamp,
+  setDoc,
+  doc,
 } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
@@ -132,28 +134,32 @@ const AllPublicPlansScreen = ({ navigation }: any) => {
 
     try {
       const db = getFirestore();
-      const savedPlansRef = collection(db, `users/${currentUser.uid}/savedPlans`);
-      
-      // Check if already saved
+      const savedPlansRef = collection(db, `user_plans/${currentUser.uid}/plans`);
+
       const existingQuery = query(savedPlansRef, where('originalPlanId', '==', plan.id));
       const existingDocs = await getDocs(existingQuery);
-      
-      if (!existingDocs.empty) {
-        Alert.alert('Info', 'Plan already saved to your list');
+
+      // console.log('Existing docs:', existingDocs.docs, plan.id);
+
+      if (existingDocs.docs.length > 0) {
+        Alert.alert('Info', 'Plan already exists to your list');
         return;
       }
 
+      const newPlanRef = doc(savedPlansRef);
+      console.log('New plan ref id:', newPlanRef.id);
+      
       const savedPlan = {
         ...plan,
+        id: newPlanRef.id,
         originalPlanId: plan.id,
-        originalUserId: plan.userId,
+        userId: currentUser.uid,
         savedAt: serverTimestamp(),
         isEdited: false,
         visibility: 'private'
       };
-      delete savedPlan.id;
 
-      await addDoc(savedPlansRef, savedPlan);
+      await setDoc(newPlanRef, savedPlan);
       Alert.alert('Success', 'Plan saved successfully!');
     } catch (error) {
       console.error('Error saving plan:', error);

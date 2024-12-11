@@ -128,6 +128,7 @@ export default function CreatePlan({ navigation }: any) {
   
       // Generate a unique plan ID
       const newPlanRef = doc(userPlansRef);
+      console.log('newPlanRef', newPlanRef);
       const planWithId = {
         ...plan,
         id: newPlanRef.id,  

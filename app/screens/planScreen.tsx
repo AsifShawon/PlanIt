@@ -133,10 +133,22 @@ ${plan.places.map((place) => `- ${place.name} (${place.duration})`).join('\n')}
           onPress: async () => {
             try {
               const db = getFirestore();
-              await deleteDoc(doc(db, 'user_plans', user!.uid, 'plans', plan.id));
+              // Add loading state if needed
+              const planRef = doc(db, 'user_plans', user!.uid, 'plans', plan.id);
+              const delete_msg = await deleteDoc(planRef);
+              // console.log('Plan ref:', planRef, plan.id);
+              // console.log('Document deleted successfully!', delete_msg);
+
+              
+              // Optional: Add success notification
               navigation.replace("MyPlans");
             } catch (error) {
-              Alert.alert('Error', 'Failed to delete plan');
+              // Improved error handling
+              console.error('Delete error:', error);
+              Alert.alert(
+                'Error',
+                'Failed to delete plan. Please try again later.'
+              );
             }
           },
         },

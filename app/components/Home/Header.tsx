@@ -42,7 +42,7 @@ const Header = () => {
             : require('../../../assets/user.png')} 
         />
         <View style={styles.userInfo}>
-          <Text style={styles.greeting}>Welcome,</Text>
+          <Text style={styles.greeting}>Welcome to <Text style={{fontWeight:'bold', color:'#3A4646'}}>Planit</Text></Text>
           <Text style={styles.fullname}>
             {userData?.firstName} {userData?.lastName}
           </Text>

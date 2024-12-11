@@ -22,6 +22,9 @@ import {
   DocumentSnapshot,
   addDoc,
   serverTimestamp,
+  doc,
+  setDoc,
+  or,
 } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
@@ -116,7 +119,7 @@ const PublicPlansSection = ({ navigation }: any) => {
       } else {
         setHasMore(false);
       }
-      console.log('Fetched public plans:', fetchedPlans);
+      // console.log('Fetched public plans:', fetchedPlans);
 
       setError(null);
     } catch (err) {
@@ -128,7 +131,6 @@ const PublicPlansSection = ({ navigation }: any) => {
   };
 
   const handleSavePlan = async (plan: TravelPlan) => {
-    console.log('Saving plan:', plan);
     if (!currentUser) {
       Alert.alert('Error', 'Please login to save plans');
       return;
@@ -137,28 +139,32 @@ const PublicPlansSection = ({ navigation }: any) => {
     try {
       const db = getFirestore();
       const savedPlansRef = collection(db, `user_plans/${currentUser.uid}/plans`);
-      const query_ref = collection(db, `user_plans/`);
 
       // Check if already saved
-      const existingQuery = query(query_ref, where('plans.id', '==', plan.id));
+      const existingQuery = query(savedPlansRef, where('originalPlanId', '==', plan.id));
       const existingDocs = await getDocs(existingQuery);
 
-      if (!existingDocs.empty) {
+      console.log('Existing docs:', existingDocs.docs, plan.id);
+
+      if (existingDocs.docs.length > 0) {
         Alert.alert('Info', 'Plan already exists to your list');
         return;
       }
 
+      const newPlanRef = doc(savedPlansRef);
+      console.log('New plan ref id:', newPlanRef.id);
+      
       const savedPlan = {
         ...plan,
+        id: newPlanRef.id,
         originalPlanId: plan.id,
-        originalUserId: currentUser.uid,
+        userId: currentUser.uid,
         savedAt: serverTimestamp(),
         isEdited: false,
         visibility: 'private'
       };
-      delete savedPlan.id;
 
-      await addDoc(savedPlansRef, savedPlan);
+      await setDoc(newPlanRef, savedPlan);
       Alert.alert('Success', 'Plan saved successfully!');
     } catch (error) {
       console.error('Error saving plan:', error);
